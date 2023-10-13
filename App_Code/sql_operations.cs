@@ -1,14 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Configuration;
-using System.Linq;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Xml.Linq;
 using System.Data.OleDb;
 using System.Net.Mail;
 using System.Data.SqlClient;
@@ -51,6 +43,23 @@ public class sql_operations
             var imageRectangle = new Rectangle(0, 0, newWidth, newHeight);
             thumbGraph.DrawImage(image, imageRectangle);
             thumbnailImg.Save(targetPath, image.RawFormat);
+        }
+    }
+
+
+   public long CalculateFileSizeInKB(string filePath)
+    {
+        if (File.Exists(filePath))
+        {
+            FileInfo fileInfo = new FileInfo(filePath);
+            long fileSizeBytes = fileInfo.Length;
+            long fileSizeKB = fileSizeBytes / 1024; // 1 KB = 1024 bytes
+            return fileSizeKB;
+        }
+        else
+        {
+            Console.WriteLine("File does not exist.");
+            return -1; // Return -1 to indicate an error
         }
     }
 
