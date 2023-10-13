@@ -1,0 +1,129 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Admin.master.cs" Inherits="Admin" %>
+
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Data.SqlClient" %>
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <style type="text/css">
+        .navbar-inverse {
+            background-color: #001e3e;
+            border-color: #001e3e;
+        }
+    </style>
+    <meta charset="utf-8" />
+    <title>Govt.V.Y.T.PG. Autonomous College, Durg</title>
+    <meta charset="utf-8" />
+
+    <meta name="keywords" content="Govt.V.Y.T.PG. Autonomous College, Durg" />
+    <meta name="description" content="Govt.V.Y.T.PG. Autonomous College, Durg" />
+    <meta name="author" content="Govt.V.Y.T.PG. Autonomous College, Durg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+
+
+    <form id="form1" runat="server">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-md-8 col-sm-8 col-xs-8" style="padding-top: 12px;">
+                    <a href="<%= Page.ResolveUrl("~/index.aspx") %>">
+                        <img class="img-responsive header-logo__img" src="assets/images/logo.png" alt="Govt.V.Y.T.PG. Autonomous College, Durg" /></a>
+                </div>
+                <div class="col-md-4 col-sm-4 col-xs-4" style="padding-top: 12px;">
+                    <asp:Button runat="server" Text="Log Out" class="btn btn-primary tp-resizeme" ID="btn_login" OnClick="btn_login_Click"></asp:Button>
+                </div>
+            </div>
+
+        </div>
+
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#" style="color: white;">Control Panel</a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav">
+                    <%
+                        if(Session["iamuser"] == null)
+                        {
+                            Response.Redirect("science_login.aspx");
+                        }
+                        else
+                        {
+                            if(Session["iamuser"].ToString()=="scdurg")
+                            {
+                                %>
+                        <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#" style="color: white;">Home <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="science_user_management.aspx">Change Password</a></li>
+                                <li><a href="science_Post_Latest_Update.aspx">Latest News</a></li>
+                                <%--<li><a href="science_Post_Latest_Update.aspx">News & Notice</a></li>--%>
+                                <li><a href="science_post_flash.aspx">Post Flash</a></li>
+                                <li><a href="post_newvideos.aspx" style="color: white;">NAAC Videos</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#" style="color: white;">Menu <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="post_science_Head.aspx">Page Head</a></li>
+                                <li><a href="ScienceSubMenu.aspx">Sub Menu</a></li>
+                            </ul>
+                        </li>
+                                <%
+                            }
+                        }
+
+                    %>
+                    
+                        
+                        
+                        <li><a href="post_faculties.aspx" style="color: white;">Faculty Profile</a></li>                        
+                        <li><a href="post_science_data.aspx" style="color: white;">Sub Menu Data</a></li>
+                        <li><a href="post_pastevents.aspx" style="color: white;">Photo Gallery</a></li>
+                        <li><a href="post_course_code.aspx" style="color: white;">Course Code & Credit</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div style="min-height: 600px">
+            <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+            </asp:ContentPlaceHolder>
+        </div>
+        <footer id="footer" class="footer divider layer-overlay overlay-dark-8">
+
+            <div class="footer-bottom bg-black-333">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-5">
+                            <p class="font-11 text-black-777 m-0 copy-right">Govt.V.Y.T.PG. Autonomous College, Durg</p>
+                        </div>
+                        <div class="col-md-6 col-sm-7 text-right">
+                            <p class="font-11 text-black-777 m-0 copy-right">
+                                Powered by : <a href="https://www.ravisolutions.com/" target="_blank">RAVI SOLUTIONS</a>
+
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </form>
+</body>
+</html>

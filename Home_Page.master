@@ -1,0 +1,372 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Home_Page.master.cs" Inherits="Home_Page" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Data.SqlClient" %>
+<%@ Import Namespace="System.IO" %>
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimal-ui" />
+    <link href="favicon.png" type="image/x-icon" rel="shortcut icon" />
+    <link href="assets/css/master.css" rel="stylesheet" />
+<!-- SWITCHER -->
+    <link href="assets/plugins/switcher/css/switcher.css" rel="stylesheet"  media="all" />
+    <link href="assets/plugins/switcher/css/color1.css" rel="alternate stylesheet" title="color1" media="all" />
+    <script src="assets/plugins/jquery/jquery-1.11.3.min.js"></script>
+
+    <style>
+  
+          .sp-mask{
+            height: 528px;
+          }
+
+          .scrollToTop {
+    background: rgba(0, 0, 0, 0.1);
+    bottom: 15px;
+    display: none;
+    height: 50px;
+    padding: 2px;
+    position: fixed;
+    right: 15px;
+    text-align: center;
+    text-decoration: none;
+    width: 50px;
+    z-index: 99999;
+}
+
+          .scrollToTop i {
+  color: #fff;
+  font-size: 42px;
+}
+.scrollToTop:hover {
+  background: rgba(0, 0, 0, 0.6);
+  text-decoration: none;
+}
+
+    .blinking{
+    font-size:16px;font-weight:bold;
+    animation:blinkingText 0.8s infinite;
+}
+
+@keyframes blinkingText{
+    0%{     color:#0252ac;    }
+    25%{     color:#0252ac;    }
+    49%{    color: #0252ac; }
+    50%{    color: #0252ac; }
+    99%{    color:transparent;  }
+    75%{     color:transparent;    }
+    100%{   color: transparent;    }
+}
+
+   .blinkingRed{
+    font-size:16px;font-weight:bold;
+    animation:blinkingTextRed 0.8s infinite;
+}
+@keyframes blinkingTextRed{
+    0%{     color:#f00;    }
+    25%{     color:#f00;    }
+    49%{    color: #f00; }
+    50%{    color: #f00; }
+    99%{    color:transparent;  }
+    75%{     color:transparent;    }
+    100%{   color: transparent;    }
+}
+
+img.sticky {
+  position: -webkit-sticky;
+  position: absolute;
+  float:right;
+  top: 0px;
+  right: 0px;
+  max-width:150px;
+}
+
+    </style>
+
+
+    <!--For responsive menu-->
+    <link rel="stylesheet" href="styles.css">
+   <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+   <script src="script.js"></script>
+
+    <asp:ContentPlaceHolder id="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    
+<div class="layout-theme" data-header-top="200"> 
+  <a href="https://drive.google.com/file/d/1lVgdtokcIYm_Dd8tq5zJwYzfqsqtjaHu/view?usp=drive_link" target="_blank"><img src="images/vt.gif" class="sticky img-responsive" alt="Virtual Tour" /></a>
+  <div id="wrapper"> 
+        <form id="form1" runat="server">
+        <script runat='server'>
+            DataTable dt_menu = SqlHelper.ExecuteDataTable(Connection.My_Connection(), CommandType.Text, "SELECT [PAGE_ID] ,[PAGE_HEAD_ID] ,[PAGE_NAME] ,[SHOW] ,[SUB_MENU] ,[REORDER],IS_LINK,LINK_URL FROM [TBL_SCD_PAGE] WHERE SHOW='Yes' ORDER BY REORDER,PAGE_ID");
+
+            public string SubMenuFuction(string pageheadid)
+            {
+                string str_menu = "";
+                foreach (DataRow dr in dt_menu.Select("PAGE_HEAD_ID = "+pageheadid))
+                {
+                    string issubmenu = dr["SUB_MENU"].ToString();
+                    if (issubmenu == "Yes")
+                    {
+                        str_menu += "<li class='has-sub' data-pageheadid='"+pageheadid+"'><a href='#'>" + dr["PAGE_NAME"].ToString() + "</a>";
+                        str_menu += "<ul class='has-sub'>";
+
+                        string str_submenu_query = @"SELECT [PAGE_ID] ,[TBL_SCD_PAGE].[PAGE_HEAD_ID] ,[PAGE_NAME] ,[TBL_SCD_PAGE].[SHOW] ,[SUB_MENU] ,[TBL_SCD_PAGE].[REORDER],IS_LINK,LINK_URL FROM [TBL_SCD_PAGE] WHERE [TBL_SCD_PAGE].SHOW='Yes' AND PAGE_HEAD_ID=(SELECT PAGE_HEAD_ID FROM TBL_SCD_PAGE_HEAD WHERE PAGE_HEAD_NAME='" + dr["PAGE_NAME"].ToString() + "') ORDER BY [TBL_SCD_PAGE].REORDER,PAGE_ID";
+                        DataTable dt_submenu = SqlHelper.ExecuteDataTable(Connection.My_Connection(), CommandType.Text, str_submenu_query);
+
+                        foreach (DataRow drs in dt_submenu.Rows)
+                        {
+                            string str_link = drs["PAGE_NAME"].ToString();
+                            string str_pageid = drs["PAGE_ID"].ToString();
+
+                            string str_linkdescription = drs["IS_LINK"].ToString();
+                            string str_url = drs["LINK_URL"].ToString();
+
+                            if (str_linkdescription == "Link")
+                            {
+                                str_menu += "<li data-pageid='"+str_pageid+"'><a href='" + str_url + "'>" + str_link + "</a></li>";
+                            }
+                            else
+                            {
+                                str_menu += "<li data-pageid='"+str_pageid+"'><a href='" + Page.ResolveUrl("~/scpage.aspx?PageName=" + str_link + "") + "'>" + str_link + "</a></li>";
+                            }
+
+                        }
+                        str_menu += "</ul></li>";
+                    }
+                    else
+                    {
+                        string str_link = dr["PAGE_NAME"].ToString();
+                        string str_pageid = dr["PAGE_ID"].ToString();
+
+                        string str_linkdescription = dr["IS_LINK"].ToString();
+                        string str_url = dr["LINK_URL"].ToString();
+
+                        if (str_linkdescription == "Link")
+                        {
+                            str_menu += "<li data-pageid='"+str_pageid+"'><a href='" + str_url + "'>" + dr["PAGE_NAME"].ToString() + "</a></li>";
+                        }
+                        else
+                        {
+                            str_menu += "<li data-pageid='"+str_pageid+"'><a href='" + Page.ResolveUrl("~/scpage.aspx?PageName=" + str_link + "") + "'>" + dr["PAGE_NAME"].ToString() + "</a></li>";
+                        }
+                    }
+                }
+
+                return str_menu;
+            }
+        </script>
+    <!-- HEADER -->
+    <header class="header">
+      
+      <!-- end top-header  -->
+      <div style="background-color:#eeeded;">
+            <div class="container">
+                <div class="row">
+                    <%--<div class="col-lg-2 col-xs-12"><button class="btn btn-success">LATEST UPDATES
+                </button></div>
+                    <div class="col-lg-10 col-xs-12">
+                        <marquee direction="left" width="320px" height="28" scrollamount="4" onmouseover="this.stop()" onmouseout="this.start()" style="margin: 0px; padding: 0px; height: 28px; width: 100%;">
+                    <asp:PlaceHolder ID="placeHolderLatestNews" runat="server"></asp:PlaceHolder>                                 
+                </marquee> 
+                    </div>--%>
+
+                    <div class="col-lg12 col-xs-12" style="font-weight:bold; font-size:12px;">
+                        <a href="https://ocm.govtsciencecollegedurg.ac.in/" target="_blank" class="blinking">Online Video Lectures</a> &nbsp; | &nbsp; 
+                        <a href="https://ir.govtsciencecollegedurg.ac.in/" style="color:#000;">Institutional Repository</a> &nbsp; | &nbsp; 
+                        <a href="http://www.elibrarysciencecollegedurg.ac.in/" style="color:#000;">Library & Information Centre</a> &nbsp; | &nbsp; 
+                        <a href="https://epls.govtsciencecollegedurg.ac.in/" target="_blank" style="color:#000;">E-Public Library Service</a> &nbsp; | &nbsp; 
+                        <a href="https://voters.eci.gov.in/" style="font-weight:700;color balck;">
+<span>&nbsp;<img src="https://voterportal.eci.gov.in/nvsp/image/eci-logo.png" style="height:32px;width:32px;">Voter Portal</span>
+</a>
+                        <%--<a href="scpage.aspx?PageName=Programs Offered"style="color:#000;">Course Offered</a>--%> &nbsp; | &nbsp; 
+                        <%--<a href="Quicklinks.aspx?pname=Right to Information"style="color:#000;">RTI</a> &nbsp; | &nbsp; --%>
+                        <a href="scpage.aspx?PageName=RTI"style="color:#000;">RTI</a> &nbsp; | &nbsp; 
+                        <a href="scpage.aspx?PageName=Anti Ragging Committee"style="color:#000;">Anti-Ragging</a> &nbsp; | &nbsp; 
+                        <a href="https://forms.gle/4KVVckXHbcg3kA6C8"style="color:#000;">Alumni Registration</a> &nbsp; | &nbsp; 
+                    </div>
+                </div>
+                
+             </div>
+            </div>
+        <%--<div style="background-color:#0f0580;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg12 col-xs-12" style="font-weight:bold; font-size:14px;">
+                        <a href="http://www.ncemn2022.in/" target="_blank" style="color:#FFF;">12th National Conference on Emerging Materials & Nanotechnology (NCEMN-2022) November 18-19, 2022 <span style="color:#f98554;">(Click here for more details)</span></a>
+                    </div>
+                </div>
+                
+             </div>
+            </div>--%>
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12" id="header-img"> 
+            <a class="header-logo" href="index.aspx">
+                <img class="img-responsive header-logo__img" src="assets/images/logo.png" alt="Govt.V.Y.T.PG. Autonomous College, Durg" />
+            </a>
+          </div>
+            <%--<div class="col-md-4 col-xs-12"> 
+             <a href="onlinevideo_lect.aspx?page=Cultural%20Activities"><h3 class="blinking">Celebration for Azadi ka Amrit Mahotsav</h3></a>
+                <a href="https://epls.govtsciencecollegedurg.ac.in/" target="_blank" class="blinking">E-Public Library Service</a>
+            </div>--%>
+        <!-- end row  --> 
+      </div>
+          
+      </div>
+      
+        <nav id="navigation" class="clrleft bcurow" style="background-color:#e1e1e1;">
+                <div class="container">
+                    <div class="row">
+                        
+        <div id='cssmenu' style="z-index:9999; background-color:#e1e1e1;">
+            <ul>
+                <%
+                    string str_pagehead = "SELECT [PAGE_HEAD_ID] ,[PAGE_HEAD_NAME],[SHOW],[REORDER] FROM [TBL_SCD_PAGE_HEAD] WHERE SHOW='Yes' order by [REORDER]";
+
+                    DataTable dt_pagehead = SqlHelper.ExecuteDataTable(Connection.My_Connection(), CommandType.Text, str_pagehead);
+
+                    if (dt_pagehead.Rows.Count > 0)
+                    {
+                        foreach (DataRow dr in dt_pagehead.Rows)
+                        {
+                %>
+                <li class="has-sub" data-pageheadid="<%= dr["PAGE_HEAD_ID"].ToString() %>"><a href="#"><%= dr["PAGE_HEAD_NAME"].ToString() %></a>
+                    <ul>
+
+                        <%
+                                                        string str_s_menu = "";
+                                                        str_s_menu = SubMenuFuction(dr["PAGE_HEAD_ID"].ToString());
+                        %>
+                        <%= str_s_menu %>
+                    </ul>
+                </li>
+                <%
+                                                    }
+                                                }
+                %>
+            </ul>
+        </div>
+                    </div>
+                </div>
+        </nav>
+      <!-- end container--> 
+    </header>
+    <!-- end header -->
+
+
+    <div class="main-content">
+            <div style="min-height:600px;">
+                <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">        
+                </asp:ContentPlaceHolder>
+            </div>
+      </div>
+
+      <footer class="footer">
+      <div class="container">
+        <div class="footer-inner border-decor_top">
+          <div class="row">
+            <div class="col-lg-4 col-sm-4">
+              <section class="footer-section">
+                <h3 class="footer-title">ABOUT US</h3>
+                <a href="javascript:void(0);"><img class="footer-logo img-responsive" src="assets/images/logo_white.png" height="50" width="195" alt="Logo"></a>
+                <div class="footer-contacts footer-contacts_mod-a"> <i class="icon stroke icon-Pointer"></i>
+                  <address class="footer-contacts__inner">
+                  Near Raipur Naka, G.E. Road, Durg, [C.G.]
+                  </address>
+                </div>
+                <div class="footer-contacts"> <i class="icon stroke icon-Phone2"></i> <span class="footer-contacts__inner">Call us (0788) 2359688</span> </div>
+                <div class="footer-contacts"> <i class="icon stroke icon-Mail"></i> <a class="footer-contacts__inner" href="mailto:pprinci2010@gmail.com">pprinci2010@gmail.com</a></div>
+              </section>
+              <!-- end footer-section --> 
+            </div>
+            <!-- end col -->
+            
+            <div class="col-lg-4 col-sm-4">
+              <section class="footer-section">
+                <h3 class="footer-title">USEFUL LINKS</h3>
+                <ul class="footer-list list-unstyled">
+                  <li class="footer-list__item"><a class="footer-list__link" href="http://www.durguniversity.ac.in/">Hemchand Yadav Vishwavidyalaya, Durg </a></li>
+                  <li class="footer-list__item"><a class="footer-list__link" href="https://www.ugc.ac.in/">UGC</a></li>
+                  <li class="footer-list__item"><a class="footer-list__link" href="http://www.naac.gov.in/">NAAC</a></li>
+                  <li class="footer-list__item"><a class="footer-list__link" href="https://rtionline.gov.in/">RTI Online</a></li>
+                  <li class="footer-list__item"><a class="footer-list__link" href="Result.aspx">Results</a></li>
+                  <li class="footer-list__item"><a class="footer-list__link" href="Clogin.aspx">Admin Login</a></li>
+                </ul>
+              </section>
+              <!-- end footer-section --> 
+            </div>
+            <!-- end col -->
+            
+            <div class="col-lg-4 col-sm-4">
+              <section class="footer-section">
+                <h3 class="footer-title">EXTERNAL LINKS</h3>
+                <ul class="footer-list list-unstyled">
+                  <li class="footer-list__item"><a class="footer-list__link" href="https://nptel.ac.in/">NPTEL</a></li>
+                  <li class="footer-list__item"><a class="footer-list__link" href="http://www.ggu.ac.in/download/SWAYAM-BOOKLET%2008.08.18.pdf">SWAYAM-BOOKLET</a></li>
+                  <li class="footer-list__item"><a class="footer-list__link" href="https://swayamprabha.gov.in/">SWAYAM PRABHA</a></li>
+                  <li class="footer-list__item"><a class="footer-list__link" href="https://swayam.gov.in/">SWAYAM MOOCs</a></li>
+                  <li class="footer-list__item"><a class="footer-list__link" href="http://epgp.inflibnet.ac.in/">e-PG PATHSHALA</a></li>
+                  <li class="footer-list__item"><a class="footer-list__link" href="Department_Login.aspx">Department Login</a></li>
+                </ul>
+              </section>
+              <!-- end footer-section --> 
+            </div>
+            <!-- end col -->
+            
+           
+          </div>
+          <!-- end row --> 
+        </div>
+        <!-- end footer-inner -->
+        
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="footer-bottom">
+              <div class="copyright">All Rights Reserved @ Govt.V.Y.T.PG. Autonomous College, Durg</div>
+              <ul class="social-links list-unstyled">
+                Powered by <a href="http://www.ravisolutions.com">Ravi Solutions</a>
+              </ul>
+            </div>
+            <!-- end footer-bottom --> 
+          </div>
+          <!-- end col --> 
+        </div>
+        <!-- end row --> 
+      </div>
+      <!-- end container --> 
+    </footer>
+
+<a class="scrollToTop" href="#"><i class="fa fa-angle-up"></i></a>
+
+            </form>
+      </div>
+    </div>
+<script src="assets/js/jquery-migrate-1.2.1.js"></script>
+<script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script> 
+<script src="assets/js/modernizr.custom.js"></script> 
+<script src="assets/js/waypoints.min.js"></script> 
+<script src="../../cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script> 
+
+<!--THEME--> 
+<script  src="assets/plugins/sliderpro/js/jquery.sliderPro.js"></script> 
+<script src="assets/plugins/owl-carousel/owl.carousel.min.js"></script> 
+<script src="assets/plugins/isotope/jquery.isotope.min.js"></script> 
+<script src="assets/plugins/prettyphoto/js/jquery.prettyPhoto.js"></script> 
+<script src="assets/plugins/datetimepicker/jquery.datetimepicker.js"></script> 
+<script src="assets/plugins/jelect/jquery.jelect.js"></script> 
+<script src="assets/plugins/rendro-easy-pie-chart/dist/jquery.easypiechart.min.js"></script> 
+<script src="assets/js/cssua.min.js"></script> 
+<script src="assets/js/wow.min.js"></script> 
+<!--<script src="assets/js/custom.min.js"></script> 
+--><script src="assets/js/custom.js"></script> 
+
+<!--COLOR SWITCHER --> 
+<script src="assets/plugins/switcher/js/bootstrap-select.js"></script> 
+<script src="assets/plugins/switcher/js/dmss.js"></script>
+
+</body>
+</html>

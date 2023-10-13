@@ -1,0 +1,76 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using System.Data.OleDb;
+
+public partial class _Pastevents : System.Web.UI.Page
+{
+    OleDbConnection conn = new OleDbConnection(ConfigurationManager.AppSettings["connect"]);
+
+    string my_table;
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        try
+        {
+            OleDbDataAdapter adpt_select = new OleDbDataAdapter("select * from tbl_past_event order by event_id desc", conn);
+            DataSet ds_select = new DataSet();
+            adpt_select.Fill(ds_select,"tbl_select");
+
+            my_table="";
+
+            if (ds_select.Tables["tbl_select"].Rows.Count > 0 && ds_select.Tables["tbl_select"].Rows[0][0].ToString() != "")
+            {
+                
+
+                for(int i=0;i<ds_select.Tables["tbl_select"].Rows.Count;i++)
+                {
+                    //if (i % 2 == 0)
+                    //{
+                    //    my_table += "<div class='row'>";
+                    //}
+
+                    //my_table+="<div class='col-lg-3 col-md-3 col-sm-3'>";
+                    //my_table += "<figure><a href='events_details.aspx?eid=" + ds_select.Tables["tbl_select"].Rows[i][0].ToString() + "' style='color:#000;' target='_blank'><img src='" + ds_select.Tables["tbl_select"].Rows[i][4].ToString() + "'/></a></figure></div>";
+                    //my_table += "<div class='col-lg-3 col-md-3 col-sm-3'><span style='font-family:calibri; font-size:18px; color:#ea0303; line-height:1.8em;'>" + ds_select.Tables["tbl_select"].Rows[i][1].ToString() + "</span><br><span style='color:#333; font-size:14px; line-height:1.8em;'>Venue : " + ds_select.Tables["tbl_select"].Rows[i][3].ToString() + "<br>Date : " + ds_select.Tables["tbl_select"].Rows[i][2].ToString() + "</span><br>";
+                    //my_table +="<span style='font-family:calibri; font-size:16px;'><a href='events_details.aspx?eid=" + ds_select.Tables["tbl_select"].Rows[i][0].ToString() + "' style='color:#000;' target='_blank'>Click here for details</a></span></div>";
+
+                    //if (i % 2 == 1)
+                    //{
+                    //    my_table += "</div>";
+                    //    my_table += "<div class='row'>";
+                    //    my_table += "<div class='col-lg-12 col-md-12 col-sm-12'>&nbsp;</div>";
+                    //}
+
+                    my_table += "<div class='row'>";
+
+                    my_table += "<div class='col-lg-4 col-md-4 col-sm-4'>";
+                    my_table += "<figure><a href='events_details.aspx?eid=" + ds_select.Tables["tbl_select"].Rows[i][0].ToString() + "' style='color:#000;' target='_blank'><img src='" + ds_select.Tables["tbl_select"].Rows[i][4].ToString() + "' class='img-responsive'/></a></figure></div>";
+                    my_table += "<div class='col-lg-8 col-md-8 col-sm-8'><span><h4>" + ds_select.Tables["tbl_select"].Rows[i][1].ToString() + "<h4></span><br><span style='color:#333; font-size:14px; line-height:1.8em;'>Venue : " + ds_select.Tables["tbl_select"].Rows[i][3].ToString() + "<br>Date : " + ds_select.Tables["tbl_select"].Rows[i][2].ToString() + "</span><br>";
+                    my_table += "<span style='line-height:1.8em;'><a href='events_details.aspx?eid=" + ds_select.Tables["tbl_select"].Rows[i][0].ToString() + "' style='color:#000;' target='_blank'>Click here for details</a></span></div>";
+
+                    my_table += "</div>";
+                    my_table += "<div class='row'>";
+                    my_table += "<div class='col-lg-12 col-md-12 col-sm-12'>&nbsp;</div></div>";
+                    
+                    
+                }
+                
+                desc_content.InnerHtml = my_table.ToString();
+            }
+        }
+        catch (Exception ee)
+        {
+ 
+        }
+    }
+}
